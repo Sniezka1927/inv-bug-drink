@@ -43,16 +43,27 @@ mod flipper {
             let current_timestamp = self.env().block_timestamp().clone() as u128;
             let timestamp_delta = (current_timestamp - self.last_timestamp) as u128;
 
-            let multiplication =
-                match 1000000000000000000000000000000u128.checked_mul(timestamp_delta) {
-                    Some(result) => result,
-                    None => return Err(TestError::MULOverflow),
-                };
+            let multiplication = (1000000000000000000000000000000u128)
+                .checked_mul(timestamp_delta)
+                .unwrap_or(0);
 
-            let value = match multiplication.checked_mul(1000000000000) {
-                Some(result) => result,
-                None => return Err(TestError::MULOverflow),
-            };
+            let value = multiplication.checked_mul(1000000000000).unwrap_or(0);
+
+            // To don't let compiler ignore the value
+            ink::env::debug_println!("value = {}", value);
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn update_timestamp_diffrent_operations_sub(&mut self) -> Result<(), TestError> {
+            let current_timestamp = self.env().block_timestamp().clone() as u128;
+            let timestamp_delta = (current_timestamp - self.last_timestamp) as u128;
+
+            let multiplication = (1000000000000000000000000000000u128)
+                .checked_mul(timestamp_delta)
+                .unwrap_or(0);
+
+            let value = multiplication.checked_sub(1000000000000).unwrap_or(0);
 
             // To don't let compiler ignore the value
             ink::env::debug_println!("value = {}", value);
@@ -64,16 +75,11 @@ mod flipper {
             let current_timestamp = self.env().block_timestamp().clone() as u128;
             let timestamp_delta = (current_timestamp - self.last_timestamp) as u128;
 
-            let multiplication =
-                match 1000000000000000000000000000000u128.checked_mul(timestamp_delta) {
-                    Some(result) => result,
-                    None => return Err(TestError::MULOverflow),
-                };
+            let multiplication = (1000000000000000000000000000000u128)
+                .checked_mul(timestamp_delta)
+                .unwrap_or(0);
 
-            let value = match multiplication.checked_add(1000000000000) {
-                Some(result) => result,
-                None => return Err(TestError::ADDOverflow),
-            };
+            let value = multiplication.checked_add(1000000000000).unwrap_or(0);
 
             // To don't let compiler ignore the value
             ink::env::debug_println!("value = {}", value);
@@ -85,16 +91,11 @@ mod flipper {
             let current_timestamp = self.env().block_timestamp().clone() as u128;
             let timestamp_delta = (current_timestamp - self.last_timestamp) as u128;
 
-            let multiplication =
-                match 1000000000000000000000000000000u128.checked_mul(timestamp_delta) {
-                    Some(result) => result,
-                    None => return Err(TestError::MULOverflow),
-                };
+            let multiplication = (1000000000000000000000000000000u128)
+                .checked_mul(timestamp_delta)
+                .unwrap_or(0);
 
-            let value = match multiplication.checked_div(1000000000000) {
-                Some(result) => result,
-                None => return Err(TestError::DIVOverflow),
-            };
+            let value = multiplication.checked_div(1000000000000).unwrap_or(0);
 
             // To don't let compiler ignore the division
             ink::env::debug_println!("division = {}", value);
@@ -106,9 +107,13 @@ mod flipper {
             let current_timestamp = self.env().block_timestamp().clone() as u128;
             let timestamp_delta = (current_timestamp - self.last_timestamp) as u128;
 
+            // let timestamp_delta = 10_000;
+
             // 10^30 * delta
-            let multiplication = 1000000000000000000000000000000u128 * (timestamp_delta);
-            let division = multiplication / (1000000000000);
+            let multiplication = (1000000000000000000000000000000u128)
+                .checked_mul(timestamp_delta)
+                .unwrap_or(0);
+            let division = multiplication.checked_div(1000000000000).unwrap_or(0);
 
             let value = division;
             self.last_timestamp = current_timestamp as u128;
